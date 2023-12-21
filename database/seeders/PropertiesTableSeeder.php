@@ -1,0 +1,173 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+
+class PropertiesTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $properties = [
+            [
+                'property_id' => 'P2321',
+                'property_name' => 'Luxury Villa',
+                'property_type' => 'Villa',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => false,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'This is a sample property description.',
+                'contact' => 'Sample Contact',
+                'address_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P12',
+                'property_name' => 'Cozy Apartment',
+                'property_type' => 'Apartment',
+                'is_active' => true,
+                'is_featured' => true,
+                'is_most_liked' => false,
+                'likes' => 0,
+                'on_homepage' => true,
+                'property_description' => 'A comfortable apartment with a great view.',
+                'contact' => 'Another Contact',
+                'address_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P23',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P33',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P43',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P223',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P232',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P2333',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P243',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'property_id' => 'P233',
+                'property_name' => 'Seaside Cottage',
+                'property_type' => 'Cottage',
+                'is_active' => true,
+                'is_featured' => false,
+                'is_most_liked' => true,
+                'likes' => 0,
+                'on_homepage' => false,
+                'property_description' => 'A charming cottage by the seaside.',
+                'contact' => 'Seaside Contact',
+                'address_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+        ];
+
+        DB::table('properties')->insert($properties);
+    }
+}

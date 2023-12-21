@@ -1,0 +1,28 @@
+/* Customize the styles as needed */
+.image-upload-slider {
+  text-align: center;
+}
+
+.slider-image {
+  text-align: center;
+}
+
+.image-uploader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.image-item {
+  margin: 10px;
+  text-align: center;
+}
+
+.image-item.active {
+  border: 2px solid blue;
+}
+
+button {
+  margin-top: 10px;
+}
