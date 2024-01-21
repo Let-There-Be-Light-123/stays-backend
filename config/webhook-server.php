@@ -80,4 +80,9 @@ return [
      * underlying job that performs the webhook request.
      */
     'tags' => [],
+
+    // 'signature_validator' => Spatie\WebhookServer\SignatureValidator\DefaultSignatureValidator::class,
+    // 'webhook_profile' => Spatie\WebhookServer\WebhookProfile\ProcessEverythingWebhookProfile::class,
+    // 'webhook_model' => Spatie\WebhookServer\Models\WebhookCall::class,
+    // 'process_webhook_job' => Spatie\WebhookServer\ProcessWebhookJob::class,
 ];

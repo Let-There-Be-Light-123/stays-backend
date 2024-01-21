@@ -89,4 +89,8 @@ class Booking extends Model
 
         return $guestDetails;
     }
+    public function signatures()
+    {
+        return $this->hasMany(Signature::class);
+    }
 }

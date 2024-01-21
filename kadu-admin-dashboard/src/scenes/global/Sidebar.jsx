@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Navigate, useNavigate  } from "react-router-dom";
+import { Navigate, json, useNavigate  } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -11,13 +11,9 @@ import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import { ContextProvider, useStateContext } from "../../contexts/ContextProvider"; 
-
+import Config from "../../config/config";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -26,7 +22,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   const _token = token;
   const navigate = useNavigate();
 
-  
+
   const handleItemClick = () => {
     setSelected(title);
     _token ? navigate(to) : navigate('/login');
@@ -51,7 +47,14 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const { token,user } = useStateContext();
+  const _user = user ? JSON.parse(user) : {};
+  useEffect(()=>{
 
+  }
+
+,[]);
+  
   return (
     <Box
       sx={{
@@ -90,9 +93,9 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
+                {/* <Typography variant="h3" color={colors.grey[100]}>
                   Manager
-                </Typography>
+                </Typography> */}
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
@@ -103,13 +106,23 @@ const Sidebar = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                {(_user.files && _user.files.length > 0) ? (
+                  <img
+                    alt="profile-user"
+                    width="100px"
+                    height="100px"
+                    src={`${Config.BASE_URL}/storage/public/uploads/users/${_user.user.social_security}/${_user.files[0].filename}`}
+                    style={{ cursor: "pointer", borderRadius: "50%" }}
+                  />
+                ) : (
+                  // Render an avatar when user photo is not available
+                  <Avatar
+                    alt="Avatar"
+                    sx={{ width: 100, height: 100, cursor: "pointer" }}
+                  >
+                    {/* You can add an icon or initials for the avatar */}
+                  </Avatar>
+                )}
               </Box>
               <Box textAlign="center">
                 <Typography
@@ -118,11 +131,11 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  {/* {_user.userName} */}
+                  {_user.user && _user.user.name}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
+                {/* <Typography variant="h5" color={colors.greenAccent[500]}>
                   Job Title
-                </Typography>
+                </Typography> */}
               </Box>
             </Box>
           )}
@@ -277,10 +290,7 @@ const Sidebar = () => {
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
-            
-
-            
+            />     
           </Box>
         </Menu>
       </ProSidebar>

@@ -10,21 +10,27 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\NotificationController;
 
 class PropertyController extends Controller
 {
+    protected $notificationController;
+
+    public function __construct(NotificationController $notificationController)
+    {
+        $this->notificationController = $notificationController;
+    }
     public function index()
     {
         try {
-            $properties = Property::all();
-            // Log a success message
-            Log::info('Properties fetched successfully.');
-
+            $properties = Property::with(['files', 'rooms'])->get();
+            foreach ($properties as $property) {
+                $property->files;
+                $property->rooms;
+            }
             return response()->json(['status' => 'success', 'data' => $properties]);
         } catch (\Exception $e) {
-            // Log an error message
             Log::error('Error fetching properties: ' . $e->getMessage());
-
             return $this->errorResponse($e);
         }
     }
@@ -32,13 +38,10 @@ class PropertyController extends Controller
     public function getFeaturedProperties()
     {
         try {
-            // Log::info('Fetched Featured Properties: ');
-
             $featuredProperties = Property::where('is_active', 1)
                 ->where('is_featured', 1)
                 ->with('files')
                 ->get();
-            // Log::info('Fetched Featured Properties: ' . json_encode($featuredProperties));
             return response()->json(['status' => 'success', 'data' => $featuredProperties]);
         } catch (\Exception $e) {
             Log::info('Error fetching featured properties: ' . $e->getMessage());
@@ -52,7 +55,6 @@ class PropertyController extends Controller
                 ->take(10)
                 ->with('files')
                 ->get();
-            // Log::info('Fetched Most Liked Properties: ' . json_encode($mostLikedProperties));
             return response()->json(['status' => 'success', 'data' => $mostLikedProperties]);
         } catch (\Exception $e) {
             Log::info('Error fetching featured properties: ' . $e->getMessage());
@@ -64,12 +66,11 @@ class PropertyController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                // Add validation rules for your property fields here
-            ]);
-
             $property = Property::create($request->all());
-
+            $this->notificationController->sendWebNotificationToAll(new Request([
+                'title' => 'New Property Added',
+                'body' => $property->property_name,
+            ]));
             return response()->json(['status' => 'success', 'data' => $property], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return $this->errorResponse($e);
@@ -79,7 +80,6 @@ class PropertyController extends Controller
     public function show($propertyId)
     {
         try {
-            Log::info('Fetching property details for ID: ' . $propertyId);
             $propertyWithDetails = Property::with(['rooms', 'files'])->find($propertyId);
             if ($propertyWithDetails) {
                 return response()->json(['status' => 'success', 'data' => $propertyWithDetails]);
@@ -107,7 +107,6 @@ class PropertyController extends Controller
                 $newRooms = $request->input('rooms', []);
                 $property->rooms()->sync($newRooms);
             }
-            Log::info("Property updated successfully. Property ID: {$property->id}");
             return response()->json(['status' => 'success', 'data' => $property], Response::HTTP_OK);
         } catch (\Exception $e) {
             Log::error("Error updating property. Property ID: {$property->id}, Error: {$e->getMessage()}");
@@ -145,11 +144,9 @@ class PropertyController extends Controller
                 $room->delete();
             }
             Property::whereIn('property_id', $propertyIds)->delete();
-            Log::info('Properties, associated files, and rooms deleted successfully. Property IDs: ' . implode(', ', $propertyIds));
             return response()->json(['status' => 'success', 'message' => 'Properties, associated files, and rooms deleted successfully'], Response::HTTP_NO_CONTENT);
         } catch (\Exception $e) {
             Log::error('Error deleting properties, associated files, and rooms: ' . $e->getMessage());
-            Log::error('Request data: ' . json_encode($request->all()));
             return $this->errorResponse($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -167,12 +164,9 @@ class PropertyController extends Controller
             ]);
 
             $location = $request->input('location');
-
-            // Perform a search based on the location
             $searchedProperties = Property::where('address', 'LIKE', '%' . $location . '%')
                 ->with('files')
                 ->get();
-
             return response()->json(['status' => 'success', 'data' => $searchedProperties]);
         } catch (\Exception $e) {
             return $this->errorResponse($e);
@@ -181,20 +175,14 @@ class PropertyController extends Controller
     public function getPropertyDetailsByIds(Request $request)
     {
         try {
-            Log::info('Received request for getPropertyDetailsByIds: ' . json_encode($request->all()));
-    
             $request->validate([
                 'property_ids' => 'required|array',
                 'property_ids.*' => 'exists:properties,property_id',
             ]);
-    
             $propertyIds = $request->input('property_ids');
-            Log::info('Received property IDs: ' . json_encode($propertyIds));
-    
             $propertiesDetails = Property::whereIn('property_id', $propertyIds)
                 ->with(['files', 'rooms'])
                 ->get();
-            Log::info('Fetched property details: ' . json_encode($propertiesDetails));
             return response()->json(['status' => 'success', 'data' => $propertiesDetails]);
         } catch (\Exception $e) {
             Log::error('Exception in getPropertyDetailsByIds: ' . $e->getMessage());
@@ -209,11 +197,9 @@ class PropertyController extends Controller
                 'city' => 'required|string',
             ]);
             $city = $request->input('city');
-            Log::info("Searching properties in city: $city");
             $propertiesInCity = Property::where('address', 'LIKE', '%' . $city . '%')
                 ->with('files')
                 ->get();
-            Log::info("Found " . $propertiesInCity->count() . " properties in city: $city");
             return response()->json(['status' => 'success', 'data' => $propertiesInCity]);
         } catch (\Exception $e) {
             Log::error("Error in searchPropertiesInCity: " . $e->getMessage());

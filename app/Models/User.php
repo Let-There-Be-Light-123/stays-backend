@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'address_id',
         'address',
         'is_homeless',
+        'remember_token',
         'lat', // Added lat field
         'lng', // Added lng field
     ];

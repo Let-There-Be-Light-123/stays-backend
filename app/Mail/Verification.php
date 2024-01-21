@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log; // Import the Log facade
 
-class VerificationEmail extends Mailable
+class Verification extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -29,6 +32,13 @@ class VerificationEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Verify Your Email')->view('emails.verification');
+        try {
+            return $this->subject('Verify Your Email')
+                ->view('emails.custom');
+        } catch (\Exception $e) {
+            // Log an error if an exception occurs during the build process
+            Log::error('Error building verification email', ['error' => $e->getMessage()]);
+            throw $e; // Re-throw the exception after logging
+        }
     }
 }

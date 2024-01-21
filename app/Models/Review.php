@@ -15,7 +15,7 @@ class Review extends Model
     public $incrementing = false;
     protected $fillable = [
         'id',
-        'user_id',
+        'social_security',
         'property_id',
         'rating',
         'comment',
@@ -33,7 +33,7 @@ class Review extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'social_security');
     }
     /**
      * Define a relationship with the Property model.

@@ -58,7 +58,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="12,361"
+
             subtitle="Upcoming Bookings"
             progress="0.75"
             increase="+14%"
@@ -78,7 +78,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="431,225"
+            // title="431,225"
             subtitle="New User Application"
             progress="0.50"
             increase="+21%"
@@ -97,7 +97,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="32,441"
+            // title="32,441"
             subtitle="Verified Users"
             progress="0.30"
             increase="+5%"
@@ -116,7 +116,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="1,325,134"
+            // title="1,325,134"
             subtitle="Reviews"
             progress="0.80"
             increase="+43%"

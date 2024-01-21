@@ -30,6 +30,10 @@ import ProtectedRoute from "./protectedroute/ProtectedRoute";
 import LoginForm from "./scenes/login";
 import { AuthProvider } from './contexts/AuthContext';
 import MockAPI from './scenes/scheduler/MockAPI'
+import firebase from './firebase';
+import React, { useEffect } from 'react';
+import { getMessaging, getToken } from 'firebase/messaging';
+import BookingVoucher from "./scenes/bookingdetailspopup/booking_voucher";
 
 
 function App() {
@@ -38,8 +42,8 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const mockAPI = new MockAPI();
-
-
+  const { setFirebaseMessageToken } = useStateContext();
+  
   return (
     // <AuthProvider> {/* Wrap your component with AuthProvider */}
 
@@ -64,6 +68,7 @@ function App() {
               <Route path="/pie" element={<ProtectedRoute element={<Pie />} />} />
               <Route path="/line" element={<ProtectedRoute element={<Line />} />} />
               <Route path="/faq" element={<ProtectedRoute element={<FAQ />} />} />
+              <Route path="/bk" element={<ProtectedRoute element={<BookingVoucher />} />} />
               <Route path="/Scheduler" element={<ProtectedRoute element={<TimelineRenderer dataComponent={mockAPI} />} />} />
               <Route path="/geography" element={<ProtectedRoute element={<Geography />} />} />
               <Route path="/bookings/:status" element={<ProtectedRoute element={<Bookings />} />} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, render  } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,12 +11,22 @@ import {
     MenuItem,
 } from '@mui/material';
 import Config from '../../config/config';
+import PdfGenerator from '../../services/pdfgenerator';
+import { PDFDocument, rgb } from 'pdf-lib';
+import html2canvas from 'html2canvas';
+import BookingVoucher from './booking_voucher';
+import { useReactToPrint } from 'react-to-print';
+
 const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus }) => {
     const [newStatus, setNewStatus] = useState('');
-
+    const [currentBookingDetails, setCurrentBookingDetails] = useState(null);
+    const componentRef = React.useRef();
     useEffect(() => {
-        setNewStatus();
-    }, [open]);
+        setCurrentBookingDetails(bookingDetails);
+        console.log("Booking Details",bookingDetails);
+        console.log("Current Booking Details", currentBookingDetails);
+        setNewStatus(bookingDetails?.status || '');
+    }, [bookingDetails]);
 
     const handleStatusChange = (event) => {
         setNewStatus(event.target.value);
@@ -51,6 +61,17 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
         }
     };
 
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
+    const handleDownloadPDF = () => {
+        try {
+            handlePrint();
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    };
+    
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
             <DialogTitle style={{ fontSize: '24px' }}>Booking Details</DialogTitle>
@@ -58,7 +79,7 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
                 {bookingDetails ? (
                     <>
                         <div style={{ fontSize: '20px' }}>
-                            <strong>Booking Reference:</strong> {bookingDetails.bookingReference}
+                            <strong>Booking Reference:</strong> {bookingDetails.bookingReference }
                         </div>
                         <div style={{ fontSize: '20px' }}>
                             <strong>Room Name:</strong> {bookingDetails.roomName}
@@ -74,13 +95,11 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
                                         {guest && guest.name && (
                                             <>
                                                 <p style={{ fontSize: '18px' }}>Name: {guest.name}</p>
-                                                {/* Other properties */}
                                             </>
                                         )}
-                                        <p style={{ fontSize: '18px' }}>Email: {guest.email}</p>
-                                        <p style={{ fontSize: '18px' }}>Social Security: {guest.socialSecurity}</p>
-                                        <p style={{ fontSize: '18px' }}>Phone: {guest.phone}</p>
-                                        {/* Include other guest details as needed */}
+                                        <p style={{ fontSize: '18px' }}>Email: {guest && guest.email ? guest.email : ''}</p>
+                                        <p style={{ fontSize: '18px' }}>Social Security: {guest && guest.socialSecurity ? guest.socialSecurity :''}</p>
+                                        <p style={{ fontSize: '18px' }}>Phone: {guest && guest.phone ? guest.phone :''}</p>
                                     </li>
                                 ))
                                 : 'No guests available'}
@@ -92,10 +111,10 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
                         <h3 style={{ fontSize: '22px' }}>Booked By:</h3>
                         {bookingDetails.bookedBy ? (
                             <>
-                                <p style={{ fontSize: '18px' }}>Name: {bookingDetails.bookedBy.name}</p>
-                                <p style={{ fontSize: '18px' }}>Email: {bookingDetails.bookedBy.email}</p>
-                                <p style={{ fontSize: '18px' }}>Social Security: {bookingDetails.bookedBy.socialSecurity}</p>
-                                <p style={{ fontSize: '18px' }}>Phone: {bookingDetails.bookedBy.phone}</p>
+                                <p style={{ fontSize: '18px' }}>Name: {bookingDetails.bookedBy.name && bookingDetails.bookedBy ? bookingDetails.bookedBy.name :''}</p>
+                                <p style={{ fontSize: '18px' }}>Email: {bookingDetails.bookedBy.email &&  bookingDetails.bookedBy ?  bookingDetails.bookedBy.email : ''}</p>
+                                <p style={{ fontSize: '18px' }}>Social Security: {bookingDetails.bookedBy.socialSecurity && bookingDetails.bookedBy ?  bookingDetails.bookedBy.socialSecurity :"" }</p>
+                                <p style={{ fontSize: '18px' }}>Phone: {bookingDetails.bookedBy.phone && bookingDetails.bookedBy ? bookingDetails.bookedBy.phone :''}</p>
                             </>
                         ) : (
                             <p style={{ fontSize: '18px' }}>No booking details available</p>
@@ -130,7 +149,21 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
                 <Button variant="contained" color="primary" onClick={handleSubmit} style={{ fontSize: '18px' }}>
                     Update Status
                 </Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                        handleDownloadPDF();
+                        setCurrentBookingDetails(bookingDetails);
+                      }}
+                    style={{ fontSize: '18px' }}
+                >
+                    Download PDF
+                </Button>
             </DialogActions>
+            <div style={{ display: 'none' }}>
+                <BookingVoucher bookingDetails={bookingDetails} ref={componentRef} />
+            </div>
         </Dialog>
     );
 };

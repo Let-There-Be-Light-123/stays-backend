@@ -38,7 +38,7 @@ const AdminBookPopup = ({ open, onClose, availableRooms, onBook, propertyId, che
           throw new Error('Failed to fetch users');
         }
         const userData = await response.json();
-        console.log(userData.users);
+        // console.log(userData.users);
         const mappedUsers = userData.users.map((user) => ({
           name: user.name,
           email: user.email,
@@ -46,7 +46,7 @@ const AdminBookPopup = ({ open, onClose, availableRooms, onBook, propertyId, che
         }));
   
         setUsers(mappedUsers);
-        console.log(users);
+        // console.log(users);
       } catch (error) {
         console.error('Error fetching users:', error);
       } finally {

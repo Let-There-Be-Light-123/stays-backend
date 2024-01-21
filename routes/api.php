@@ -1,21 +1,22 @@
 <?php
 
+use App\Http\Controllers\EmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PropertyController;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
-use Laravel\Sanctum\Http\Controllers\NewAccessTokenController;
-use Laravel\Sanctum\Http\Controllers\RevokeAccessTokenController;
-use Laravel\Sanctum\Http\Controllers\TokenController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CheckAvailabilityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminLogsController;
+use App\Http\Controllers\UserReviewController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\NotificationController;
+
 
 Route::post('register', [UserController::class, 'register']); //completed
 Route::post('login', [UserController::class, 'loginUser']); //completed
@@ -39,6 +40,7 @@ Route::group(
         Route::delete('revoke-permission', [UserController::class, 'revokePermission']);//giving error
         Route::get('permissions', [UserController::class, 'getUserPermissions']);//completed
         Route::post('/register-by-admin', [UserController::class, 'registeredByAdmin']);
+        Route::post('/store-fcm-token', [UserController::class, 'storeFCMToken']);
     }
 );
 //Email Verification
@@ -136,3 +138,18 @@ Route::post('/properties/{propertyId}/images', [FileController::class, 'uploadIm
 Route::get('/user/{userId}/favorite-properties', [UserController::class, 'getFavoriteProperties']);
 Route::post('/user/favorite-properties', [UserController::class, 'addFavoriteProperty']);
 Route::post('/user/favorite-properties/remove', [UserController::class, 'removeFavoriteProperty']);
+
+Route::get('/properties/{propertyId}/reviews', [UserReviewController::class, 'index'])->name('reviews.index');
+Route::get('/properties/{propertyId}/reviews/create', [UserReviewController::class, 'create'])->name('reviews.create');
+Route::post('/reviews', [UserReviewController::class, 'store'])->middleware('auth:sanctum');
+
+Route::resource('signatures', SignatureController::class)->only([
+    'index', 'store', 'show', 'update', 'destroy',
+]);
+Route::get('get-signature-by-booking', [SignatureController::class, 'getSignaturesByBookingId']);
+
+
+Route::post('/api/send-web-notification-to-all', [NotificationController::class, 'sendWebNotificationToAll']);
+
+Route::post('/send-otp-mail', [EmailController::class, 'sendVerificationEmail']);
+Route::post('/send-temporary-password', [EmailController::class, 'sendTemporaryPassword']);

@@ -62,16 +62,19 @@ const Bookings = () => {
                 return false;
               }
             });
-            console.log("Filtered bookings", filteredBookings);
             const mappedBookings = filteredBookings.map((booking, index) => ({
               id: index + 1,
               bookingReference: booking.booking_reference,
+              property: booking.property,
               roomName: booking.rooms[0],
               roomId: booking.rooms[0], 
               userEmail: booking.booked_by.email, // Assuming only one guest in the array
               socialSecurityNumber: booking.booked_by.social_security, // Assuming the second guest's social_security
               checkInDate: new Date(booking.check_in_date),
               checkOutDate: new Date(booking.check_out_date),
+              // files: booking.files,
+              updatedAt: booking && booking.updated_at ? Date(booking.updated_at) :new Date,
+              createdAt: booking && booking.created_at ? Date(booking.created_at) : new Date(),
               status: booking.status,
               guests: booking.guests.map(guest => ({
                 name: guest.name,
@@ -82,7 +85,7 @@ const Bookings = () => {
                 isVerified: guest.is_verified,
                 isActive: guest.is_active,
                 emailVerifiedAt: guest.email_verified_at,
-                addressId: guest.address_id,
+                addressId: guest?.address_id,
                 createdAt: new Date(guest.created_at),
                 updatedAt: new Date(guest.updated_at)
               })),
@@ -99,7 +102,7 @@ const Bookings = () => {
                 createdAt: new Date(booking.booked_by.created_at),
                 updatedAt: new Date(booking.booked_by.updated_at)
               },
-              files: booking.files
+              signatures: booking.signatures
             }));
     
             setBookings(mappedBookings);

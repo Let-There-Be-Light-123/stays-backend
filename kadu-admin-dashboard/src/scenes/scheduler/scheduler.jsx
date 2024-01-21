@@ -50,7 +50,7 @@ const TimelineRenderer = (props) => {
   return isLoading ? (
     <div>"Loading Data..."</div>
   ) : (
-    <div>
+    <div style={{padding: '20px', maxWidth:'85vw'}}>
       <div id="combo-box-container">
         <FilterBox
           roomNames={mapRoomNames()}
@@ -61,6 +61,7 @@ const TimelineRenderer = (props) => {
       <div id="helper-text">
         <p>To zoom in and out, use CTRL + scroll</p>
       </div>
+      <div>
       <Timeline
         groups={getGroupsToShow()}
         items={items}
@@ -76,6 +77,7 @@ const TimelineRenderer = (props) => {
         }}
         maxZoom={30 * 86400 * 1000}
       />
+      </div>
     </div>
   );
 };

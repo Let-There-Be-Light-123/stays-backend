@@ -171,7 +171,6 @@ const EditProperty = () => {
       } else {
         console.log('No new files detected.');
       }
-      console.log('Property details updated successfully');
       setOpenDialog(true);
     } catch (error) {
       console.error('Error updating property details:', error);
@@ -315,8 +314,6 @@ const EditProperty = () => {
       formData.append('resumableTotalSize', yourTotalSize);
       formData.append('resumableIdentifier', yourIdentifier);
       formData.append('resumableFilename', yourFilename);
-
-      console.log('Uploading images. Property ID:', propertyDetails.id);
 
       const response = await fetch(`${Config.BASE_URL}/api/files/upload`, {
         method: 'POST',

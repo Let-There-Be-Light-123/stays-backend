@@ -9,6 +9,8 @@ import {
   Container,
   Grid,
 } from '@mui/material';
+// import { pdfjs } from 'react-pdf';
+// import { saveAs } from 'file-saver';
 
 const BookingApplicationDetails = () => {
   const { bookingId } = useParams();
@@ -64,6 +66,13 @@ const BookingApplicationDetails = () => {
       console.error('Error submitting application:', error);
     }
   };
+
+  const handleGeneratePDF = () => {
+    // Logic to trigger PDF generation
+    // This could include setting state to show a loading spinner or modal
+  };
+
+
   const handleBack = () => {
     navigate(-1);
   };
@@ -75,11 +84,11 @@ const BookingApplicationDetails = () => {
           Guest Application Details - Booking ID: {bookingId}
         </Typography>
         <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Button variant="contained" color="secondary" onClick={handleBack}>
-            Go Back
-          </Button>
-        </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="secondary" onClick={handleBack}>
+              Go Back
+            </Button>
+          </Grid>
           <Grid item xs={12}>
             {/* Display Guest Details */}
             <Typography variant="h6" gutterBottom>
@@ -126,8 +135,8 @@ const BookingApplicationDetails = () => {
           <Grid item xs={12}>
             {/* Checkbox for Acceptance */}
             <FormControlLabel
-             
-              control={<Checkbox checked={accepted} onChange={() => setAccepted(!accepted)}  color="secondary"/>}
+
+              control={<Checkbox checked={accepted} onChange={() => setAccepted(!accepted)} color="secondary" />}
               label="I accept this guest application."
             />
           </Grid>
@@ -142,6 +151,17 @@ const BookingApplicationDetails = () => {
               Submit Application
             </Button>
           </Grid>
+          <Grid item xs={12}>
+          {/* Button to generate PDF */}
+          <Button
+            variant="contained"
+            color="primary"  // Choose an appropriate color
+            onClick={handleGeneratePDF}
+            disabled={!accepted}
+          >
+            Generate PDF
+          </Button>
+        </Grid>
         </Grid>
       </Box>
     </Container>

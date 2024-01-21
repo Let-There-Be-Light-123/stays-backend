@@ -13,4 +13,17 @@ class Signature extends Model
         'user_id',
         'signature',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the booking that owns the signature.
+     */
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class, 'booking_id');
+    }
 }

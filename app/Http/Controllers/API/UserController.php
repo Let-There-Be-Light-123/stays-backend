@@ -22,6 +22,7 @@ use App\Models\File;
 use App\Models\Property;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\NotificationController;
 
 
 class UserController extends Controller
@@ -30,6 +31,11 @@ class UserController extends Controller
     private $domain = "lkseqc.mailer91.com";
     private $authKey = "411573Aa1y6QKQsl657759ffP1";
     private $templateId = "global_otp";
+    protected $notificationController;
+    public function __construct( NotificationController $notificationController)
+    {
+        $this->notificationController = $notificationController;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -83,15 +89,6 @@ class UserController extends Controller
     }
     public function updateAppUserDetails(Request $request, $social_security): Response
     {
-        // Commenting out the authentication check for now
-        // $authUser = Auth::user();
-
-        // Check if the authenticated user has admin or superadmin role
-        // if (!$authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
-        //     Log::info("Unauthorized access attempt by User with ID {$authUser->id}. Roles: " . implode(', ', $authUser->getRoleNames()));
-        //     return Response(['message' => 'Unauthorized'], 401);
-        // }
-
         $requestData = $request->validate([
             'phone' => 'nullable|numeric',
             'role_id' => 'nullable|exists:roles,role_id',
@@ -109,7 +106,11 @@ class UserController extends Controller
 
         // Update user details
         $user->update($requestData);
-
+        $this->notificationController->sendNotificationToUser(new Request([
+            'userId' => $social_security,
+            'title' => 'Booking Status Changed',
+            'body' => "Your profile verification status has been changed to " . ($user->is_verified ? 'Verified' : 'Not Verified'),
+        ]));
         return Response(['message' => 'User details updated successfully'], 200);
     }
     public function loginUser(Request $request): Response
@@ -162,8 +163,6 @@ class UserController extends Controller
 
     public function register(Request $request): Response
     {
-        Log::info('Starting user registration process');
-        Log::info($request);
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'identifier' => 'required',
@@ -174,17 +173,16 @@ class UserController extends Controller
             'is_homeless' => 'sometimes|boolean',
         ]);
     
-        Log::info('Social Security Value: ' . $request->input('social_security'));
-
+    
         if ($validator->fails()) {
-            Log::error('Validation failed during user registration');
+            Log::error('Validation failed during user registration. Please Enter Correct Details.');
             return response(['message' => $validator->errors()], 422);
         }
     
         $identifier = $request->input('identifier');
         $password = $request->input('password');
         $phoneNumber = $identifier;
-   
+    
         if (filter_var($phoneNumber, FILTER_VALIDATE_EMAIL)) {
             $loginField = 'email';
         } elseif (preg_match('/^\d{10}$/', $phoneNumber)) {
@@ -197,9 +195,21 @@ class UserController extends Controller
         $defaultRoleId = 'appuser';
         $defaultIsVerified = false;
         $defaultIsActive = false;
+        // Check if the user with the given social_security exists
+        $existingUser = User::where('social_security', $request->input('social_security'))->first();
     
-        Log::info('Validation successful. Creating user...');
-        Log::info('Request data: ' . json_encode($request->all()));
+        if ($existingUser) {
+            // User already exists
+            if ($existingUser->role_id === 'guest') {
+                // If the user has role_id as 'guest', update to 'appuser'
+                $existingUser->update(['role_id' => 'appuser']);
+                return response(['message' => 'User role updated successfully'], 201);
+            } else {
+                // If the user has a different role_id, return an error
+                Log::error('User with the same social_security already exists with role_id: ' . $existingUser->role_id);
+                return response(['message' => 'User with the same social_security already exists with a different role_id'], 409);
+            }
+        }
     
         try {
             $userData = [
@@ -216,31 +226,22 @@ class UserController extends Controller
     
             $user = User::create($userData);
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
             dd($e->getMessage());
         }
     
-        Log::info('User created successfully. Broadcasting registration event...');
-    
-        // event(new Registered($user));
-    
-        // Log::info('Registration event broadcasted. Returning response.');
     
         return response(['message' => 'User registered successfully'], 201);
     }
 
     public function registeredByAdmin(Request $request): Response
     {
-        Log::info("Register by admin");
         $adminRoles = ['admin', 'superadmin'];
         $loggedInUserRole = auth()->user()->role_id;
-        Log::info("User role: $loggedInUserRole");
         if (!in_array($loggedInUserRole, $adminRoles)) {
             Log::error('Unauthorized access: Only admins and superadmins can create users.');
             return response(['message' => 'Unauthorized access'], 403);
         }
 
-        Log::info('Starting user registration by admin process');
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
@@ -257,8 +258,6 @@ class UserController extends Controller
         }
         $defaultIsVerified = true;
         $defaultIsActive = true;
-        Log::info('Validation successful. Creating user by admin...');
-        Log::info('Request data: ' . json_encode($request->all()));
         try {
             $defaultPassword = 'defaultpassword';
             $user = User::create([
@@ -289,11 +288,9 @@ class UserController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
+            Log::error($e->getMessage());
             dd($e->getMessage());
         }
-
-        Log::info('User created successfully by admin.');
 
         return response(['message' => 'User created successfully by admin'], 201);
     }
@@ -311,17 +308,15 @@ class UserController extends Controller
             'role_id' => 'nullable|exists:roles,role_id',
             'is_verified' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
+            'address' =>'sometimes|string'
             // 'password' => 'nullable|min:8',
             // 'address_id' => 'nullable|exists:addresses,address_id',
         ]);
     
-        Log::info('Validating request data: ' . json_encode($requestData));
     
-        // Update the user details
         $user->fill($requestData);
         $user->save();
     
-        Log::info('User details updated successfully');
     
         return response(['message' => 'User details updated successfully'], 200);
     }
@@ -329,10 +324,7 @@ class UserController extends Controller
     {
         $authUser = Auth::user();
         if (!$authUser->hasRole('Admin') || !$authUser->hasRole('Superadmin')) {
-            // Log unauthorized access attempt
-            Log::info("Unauthorized access attempt by User with ID {$authUser->id}. Roles: " . implode(', ', $authUser->getRoleNames()));
 
-            // Return unauthorized response with role_id
             return Response(['message' => 'Unauthorized', 'role_id' => $authUser->role->role_id], 401);
         }
         $requestData = $request->validate([
@@ -341,6 +333,7 @@ class UserController extends Controller
             'role_id' => 'required|numeric|exists:roles,id', // Validate that the role_id exists in the roles table
             'is_verified' => 'required|boolean',
             'is_active' => 'required|boolean',
+            'address'=> 'sometimes|string'
         ]);
 
         try {
@@ -485,18 +478,17 @@ class UserController extends Controller
             $attachments = $request->input('attachments', []);
             $templateId = $request->input('template_id');
     
-            Log::info('Custom email request received', [
-                'recipients' => $recipients,
-                'from' => $from,
-                'domain' => $domain,
-                'reply_to' => $replyTo,
-                'attachments' => $attachments,
-                'template_id' => $templateId,
-            ]);
+            // Log::info('Custom email request received', [
+            //     'recipients' => $recipients,
+            //     'from' => $from,
+            //     'domain' => $domain,
+            //     'reply_to' => $replyTo,
+            //     'attachments' => $attachments,
+            //     'template_id' => $templateId,
+            // ]);
     
             $result = $this->sendEmail($recipients, $from, $domain, $replyTo, $templateId);
     
-            Log::info('Custom email sent successfully', ['result' => $result]);
     
             return response(['result' => $result], 200);
         } catch (\Exception $e) {
@@ -538,7 +530,6 @@ class UserController extends Controller
     {
         try {
             $user = Auth::user();
-            Log::info($user);
             if (!$user) {
                 Log::warning('User not authenticated');
                 return response(['message' => 'User not authenticated'], 401);
@@ -632,7 +623,6 @@ class UserController extends Controller
         $authUser = Auth::user();
         $authUserRole = $authUser->roleName();
         if (!($authUserRole === "Superadmin" || $authUserRole === "Admin")) {
-            Log::info("Unauthorized access attempt by User with ID {$authUser->id}. Roles: " . optional($authUser->role)->role_name);
             return Response(['message' => 'Unauthorized'], 401);
         }
 
@@ -643,14 +633,11 @@ class UserController extends Controller
         $user = null;
         if (array_key_exists('email', $requestData)) {
             $user = $this->findUserByEmail($requestData['email']);
-            Log::info("User found: " . json_encode($user));
         } elseif (array_key_exists('social_security', $requestData)) {
             $user = $this->findUserBySocialSecurity($requestData['social_security']);
-            Log::info("User found: " . json_encode($user));
         }
 
         if (!$user) {
-            Log::info("User not found. Request data: " . json_encode($requestData));
             return response(['message' => 'User not found'], 404);
         }
         $role = $user->roleName();
@@ -662,7 +649,6 @@ class UserController extends Controller
         $authUserRole = $authUser->roleName();
 
         if (!($authUserRole === "Superadmin" || $authUserRole === "Admin")) {
-            Log::info("Unauthorized access attempt by User with ID {$authUser->id}. Roles: " . optional($authUser->role)->role_name);
             return Response(['message' => 'Unauthorized'], 401);
         }
 
@@ -676,10 +662,8 @@ class UserController extends Controller
 
         if (array_key_exists('email', $requestData)) {
             $user = $this->findUserByEmail($requestData['email']);
-            Log::info("User found: " . json_encode($user));
         } elseif (array_key_exists('social_security', $requestData)) {
             $user = $this->findUserBySocialSecurity($requestData['social_security']);
-            Log::info("User found: " . json_encode($user));
         }
 
         if (!$user) {
@@ -779,7 +763,6 @@ class UserController extends Controller
 
     public function getFavoriteProperties($userId)
     {
-        Log::error('Fetch favorite properties');
 
         try {
             $user = User::find($userId);
@@ -791,7 +774,6 @@ class UserController extends Controller
     
             $favoriteProperties = $user->getFavoriteProperties();
     
-            Log::info('Favorite properties fetched successfully for user ID: ' . $userId);
     
             return response()->json(['favorite_properties' => $favoriteProperties]);
         } catch (\Exception $e) {
@@ -823,7 +805,6 @@ class UserController extends Controller
     
             $user->favoriteProperties()->attach($property);
     
-            Log::info('Property added to favorites for user ID: ' . $userId . ', property ID: ' . $propertyId);
     
             return response()->json(['message' => 'Property added to favorites']);
         } catch (\Exception $e) {
@@ -853,7 +834,6 @@ class UserController extends Controller
 
             $user->favoriteProperties()->detach($property);
 
-            Log::info('Property removed from favorites for user ID: ' . $userId . ', property ID: ' . $propertyId);
 
             return response()->json(['message' => 'Property removed from favorites']);
         } catch (\Exception $e) {
@@ -867,9 +847,6 @@ class UserController extends Controller
         $query = $request->input('query');
 
         try {
-            // Log the start of the search
-            Log::info("Searching for users with query: $query");
-            // Perform the user search
             $users = User::where('email', 'like', "%$query%")
                 ->orWhere('social_security', 'like', "%$query%")
                 ->orWhere('name', 'like', "%$query%")
@@ -887,14 +864,35 @@ class UserController extends Controller
                 ];
             });
             // Log the successful completion of the search
-            Log::info("User search completed successfully. Found " . count($users) . " users.");
-            // Return the user details in the response
             return response()->json(['users' => $userDetails]);
         } catch (\Exception $e) {
             // Log any errors that occur during the search
             Log::error('Error searching users: ' . $e->getMessage());
             // Return an error response
             return response()->json(['error' => 'An error occurred while searching users.'], 500);
+        }
+    }
+
+    public function storeFCMToken(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $fcmToken = $request->input('remember_token');
+            if ($user) {
+                if ($user->remember_token !== null) {
+                    $user->update(['remember_token' => $fcmToken]);
+                } else {
+                    $user->remember_token = $fcmToken;
+                    $user->save();
+                }
+                return response()->json(['message' => 'FCM token stored successfully.']);
+            } else {
+                Log::error('User not authenticated.');
+                return response()->json(['error' => 'User not authenticated.'], 401);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while processing the request.'], 500);
         }
     }
 

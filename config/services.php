@@ -30,5 +30,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    'firebase' => [
+        'credentials' => [
+            'file' => env('FIREBASE_CREDENTIALS_FILE'),
+            'auto_discovery' => env('FIREBASE_AUTO_DISCOVERY', true),
+        ],
+    ],
 ];

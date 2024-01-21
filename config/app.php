@@ -170,7 +170,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Laravel\Sanctum\SanctumServiceProvider::class,
-
+        Kreait\Laravel\Firebase\ServiceProvider::class,
         // Laravel\Passport\PassportServiceProvider::class,
     ])->toArray(),
 

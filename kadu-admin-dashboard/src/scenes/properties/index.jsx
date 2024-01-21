@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PropertyModel from "../../models/PropertyModel";
 import Config from "../../config/config";
 import Popup from "../../components/PopUp";
+import { useStateContext } from "../../contexts/ContextProvider";
 
 const Properties = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Properties = () => {
   const colors = tokens(theme.palette.mode);
   const [selectedRows, setSelectedRows] = useState([]);
   const [popupMessage, setPopupMessage] = useState('');
+  const { firebaseMessageToken,setFirebaseMessageToken } = useStateContext();
 
 
 
@@ -34,10 +36,7 @@ const Properties = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch properties");
       }
-
       const data = await response.json();
-      console.log(data);
-      let mappedProperties;
       if(status === "active"){
         const filteredProperties = data.data.filter(propertyData => propertyData.is_active);
         const mappedProperties = filteredProperties.map((propertyData) => new PropertyModel(propertyData));
@@ -60,7 +59,6 @@ const Properties = () => {
   };
 
   const handleRowClick = (param) => {
-    console.log("Property Clicked ", param.row.id);
     navigate(`/editproperty/${param.row.id}`);
   };
 
@@ -70,9 +68,7 @@ const Properties = () => {
 
   const handleDeleteProperties = async () => {
     try {
-      console.log("Deleting properties... ", selectedRows);
       if (selectedRows.length === 0) {
-        console.log("No properties selected for deletion.");
         setPopupMessage("No properties selected for deletion.");
         return;
       }
@@ -89,7 +85,6 @@ const Properties = () => {
       if (!response.ok) {
         throw new Error(`Failed to delete properties: ${response.statusText}`);
       }
-      console.log("Properties deleted successfully.");
       setPopupMessage("Properties deleted successfully.");
     } catch (error) {
       console.error('Error deleting properties:', error.message);
@@ -110,12 +105,14 @@ const Properties = () => {
     {
       field: "imgUrl",
       headerName: "Main Image",
+      align: "center",
+      headerAlign:"center",
       flex: 1,
       renderCell: (params) => (
         <img
           src={params.row?.imgUrl}
           alt={`Property ${params.row.id}`}
-          style={{ width: "30%", height: "100%", objectFit: "cover", padding: "10px" }}
+          style={{ width: "50%", height: "100%", objectFit: "cover", padding: "10px" }}
         />
       ),
     },
@@ -124,6 +121,8 @@ const Properties = () => {
       headerName: "Property Name",
       flex: 1,
       cellClassName: "name-column--cell",
+      align: "center",
+      headerAlign:"center",
     },
     {
       field: "category",
@@ -131,40 +130,50 @@ const Properties = () => {
       headerAlign: "center",
       align: "center",
     },
-
+    {
+      field: "totalRooms",
+      headerName: "Rooms",
+      headerAlign:"center",
+      align:"center"
+    },
     {
       field: "isActive",
       headerName: "Active Status",
       flex: 1,
+      align: "center",
+      headerAlign:"center",
     },
     {
       field: "isFeatured",
       headerName: "Featured",
       flex: 1,
+      align: "center",
+      headerAlign:"center",
     },
     {
       field: "address",
       headerName: "Location",
       flex: 1,
+      align: "center",
+      headerAlign:"center",
     },
   ];
   const handleSelectionModelChange = (newSelection) => {
-    // const selectedRowData = newSelection.map((selectedRowIndex) => properties[selectedRowIndex]);
     setSelectedRows(newSelection);
-    console.log(newSelection);
   };
   return (
     <Box m="20px">
       <Header title="TOTAL PROPERTIES" subtitle="List of Total Properties" />
       <Box
-        m="40px 0 0 0"
+        p="40px 0 0 0"
         height="75vh"
+        width="83vw"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
           },
           "& .MuiDataGrid-row": {
-            height: "100px",
+            // height: "100px",
             cursor: "pointer", // Add a pointer cursor to indicate clickable rows
           },
           "& .MuiDataGrid-cell": {
@@ -210,9 +219,10 @@ const Properties = () => {
           onRowSelectionModelChange={handleSelectionModelChange}
           selectionModel={selectedRows.map((row) => row.id)} // assuming 'id' is the unique identifier field
           checkboxSelection
+          getRowHeight={() => 100} // Set the desired height for each row
         />
       </Box>
-      <Box m="20px">
+      <Box p="20px">
         <Popup message={popupMessage} onClose={closePopup} onGoBack={goBack} />
       </Box>
     </Box>

@@ -1,0 +1,271 @@
+
+:root {
+  --font-family: 'sans-serif';
+  --font-color: #000;
+  --font-size: 18px;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.booking-voucher {
+  font-family: var(--font-family);
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  padding: 20px;
+  border-radius: 5px;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: var(--font-size); /* Update font size */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  width: '100%';
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.header-inner {
+  display: flex;
+  width: 100%;
+}
+
+.title {
+  vertical-align: center;
+  text-align: left;
+  font-size: var(--font-size);
+  font-weight: bold;
+  width: 50%;
+  display: flex;
+  text-align: center;
+  color: #000;
+}
+
+.title-image {
+  height: 100px;
+}
+
+.title-text {
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: left;
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+}
+
+
+.logo {
+  font-size: 16px;
+  color: #333;
+  height: 100px;
+  width: 50%;
+  text-align: right;
+}
+
+.logo-image {
+  height: 100px;
+}
+
+.content {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.content-inner{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
+.booking-details {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.booking-id,
+.hotel-name,
+.booking-date,
+.address {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  color: #000;
+}
+
+.hotel-details > *{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.timings{
+  display: flex;
+}
+
+.check-in {
+  width: 50%;
+  font-style: italic;
+  border-left: 3px solid orange;
+  padding-left: 10px;
+}
+.check-out {
+  width: 50%;
+  font-style: italic;
+  border-left: 3px solid orange;
+  padding-left: 10px;
+}
+
+.guest-details {
+  margin-bottom: 20px;
+  padding: 10px;
+  width: 60%;
+}
+
+.guest-details > * {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.booking-details-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+.main-guest,
+.social-security,
+.room-id,
+.property-image,
+.total-guests,
+.total-nights,
+.meal-included {
+  margin-bottom: 5px;
+  color: #000;
+  /* Set font color to black */
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.signature {
+  border-bottom: 1px solid #000;
+  padding-bottom: 5px;
+  color: #000;
+  /* Set font color to black */
+}
+
+.footer {
+  /* position: fixed; */
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  page-break-before: always;
+}
+
+.company-info {
+  width: 50%;
+  font-size: 14px;
+  color: #000;
+  display: flex;
+}
+
+.company-info-inner{
+  padding: 20px;
+}
+
+.approval {
+  height: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  max-width: 50%;
+  text-align: right;
+  vertical-align: center;
+  color: #000;
+  /* width: 100px; */
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.property-image {
+  width: 50%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+}
+.property-image-inner{
+  height: 200px;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.signature {
+  height: 70px;
+  max-width: 100px;
+  text-align: right;
+}
+.signature-text{
+  text-align: center;
+}
+.content-signature {
+  width: 100%;
+  text-align: right;
+  align-items: right;
+  max-width: 100px;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+}
+.vertical-break-footer {
+  height: auto;
+  width: 20px;
+  color: orange;
+  border-left: 20px solid orange;
+}
+
+.approval-image {
+  padding-right: 40px;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .booking-voucher {
+    width: 100%;
+  }
+}
+
+
+@media print {
+  .footer {
+    position: fixed;
+    bottom: 0;
+    /* padding: 20px; */
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    page-break-before: always;
+    font-size: var(--font-size); /* Update font size */
+    font-family: var(--font-family);
+  }
+}

@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Review;
 use Auth;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Validator;
 
@@ -21,26 +23,45 @@ class UserReviewController extends Controller
         $review = Review::findOrFail($id);
         return response()->json(['status' => 'success', 'data' => $review], 200);
     }
-
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required',
-            'rating' => 'required|numeric|between:1,5',
-            'comment' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()], 400);
+        try {
+            // Ensure the user is authenticated
+            if (!Auth::check()) {
+                return redirect()->back()->with('error', 'You must be logged in to submit a review.');
+            }
+    
+            $propertyId = $request->input('property_id');
+    
+            // Check if the user has already submitted a review for this property
+            $existingReview = Review::where('property_id', $propertyId)
+                ->where('social_security', optional(Auth::user())->social_security)
+                ->first();
+    
+            if ($existingReview) {
+                return redirect()->back()->with('error', 'You have already submitted a review for this property.');
+            }
+    
+            $request->validate([
+                'rating' => 'required|integer|min:1|max:5',
+                'comment' => 'required|string',
+            ]);
+    
+            // Create a new review
+            Review::create([
+                'social_security' => optional(Auth::user())->social_security,
+                'property_id' => $propertyId,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]);
+    
+            Log::info("Review submitted successfully for property_id: $propertyId by user_id: " . Auth::id());
+    
+            return redirect()->route('properties.show', $propertyId)->with('success', 'Review submitted successfully.');
+        } catch (\Exception $e) {
+            Log::error("Error submitting review: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error submitting review. Please try again.');
         }
-
-        $user = Auth::user();
-        $data = $request->only(['property_id', 'rating', 'comment']);
-        $data['user_id'] = $user->id;
-
-        $review = Review::create($data);
-
-        return response()->json(['status' => 'success', 'data' => $review], 201);
     }
 
     public function update(Request $request, $id)

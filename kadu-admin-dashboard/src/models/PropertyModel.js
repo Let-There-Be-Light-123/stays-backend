@@ -1,4 +1,5 @@
 import FileModel from "./FileModel";
+import Config from "../config/config";
 export default class PropertyModel {
   constructor(data) {
     this.id = data.property_id || null;
@@ -26,7 +27,9 @@ export default class PropertyModel {
       createdAt: room.created_at || null,
       updatedAt: room.updated_at || null,
     }));
+    this.totalRooms = (data.rooms && data.rooms.length ? data.rooms : 0) 
     this.files = (data.files || []).map(file => new FileModel(file));
     this.updatedFiles;
+    this.imgUrl = (data.files && data.files.length > 0) ? `${Config.BASE_URL}/storage/public/uploads/properties/${data.property_id}/${data.files[0].filename}` : `${Config.BASE_URL}/storage/public/uploads/default/house_icon_default.png`
   }
 }
