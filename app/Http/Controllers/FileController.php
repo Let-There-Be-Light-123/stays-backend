@@ -248,19 +248,11 @@ class FileController extends Controller
             $existingFile = File::where('social_security', $userId)->first();
     
             if ($existingFile) {
-                // Delete the previous file
                 Storage::delete("{$userDirectory}/{$existingFile->filename}");
-    
-                // Update the existing file
                 $image = $request->file('image');
                 $imageType = $image->getMimeType();
-                \Log::info("Updating image type for user {$userId}: {$imageType}");
-    
                 $filename = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs($userDirectory, $filename);
-                \Log::info("Image updated for user {$userId}: {$filename}");
-    
-                // Update the file record
                 $existingFile->filename = $filename;
                 $existingFile->filepath = Storage::url("{$userDirectory}/{$filename}");
                 $existingFile->filetype = $imageType;

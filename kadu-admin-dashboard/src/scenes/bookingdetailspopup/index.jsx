@@ -23,8 +23,6 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
     const componentRef = React.useRef();
     useEffect(() => {
         setCurrentBookingDetails(bookingDetails);
-        console.log("Booking Details",bookingDetails);
-        console.log("Current Booking Details", currentBookingDetails);
         setNewStatus(bookingDetails?.status || '');
     }, [bookingDetails]);
 

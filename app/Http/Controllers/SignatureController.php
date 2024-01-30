@@ -46,6 +46,7 @@ class SignatureController extends Controller
                 if (!Storage::exists($signatureDirectory)) {
                     Storage::makeDirectory($signatureDirectory);
                     Storage::setVisibility($signatureDirectory, 'public');
+                    
                 }
                 $signature = new Signature();
                 $signature->booking_id = $bookingId;
@@ -54,8 +55,8 @@ class SignatureController extends Controller
                 $image = $request->file('signature');
                 $imageName = 'signature_' . time() . '.' . $image->getClientOriginalExtension();
     
-                // Storage::disk("public/uploads/signatures/{$bookingId}")->putFileAs('signatures', $image, $imageName);
-                $image->storeAs($signatureDirectory, $imageName);
+                // $image->storeAs($signatureDirectory, $imageName);
+                Storage::putFileAs($signatureDirectory, $image, $imageName, 'public');
 
                 $signature->signature = $imageName;
                 $signature->save();

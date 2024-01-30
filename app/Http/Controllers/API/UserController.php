@@ -895,6 +895,4 @@ class UserController extends Controller
             return response()->json(['error' => 'An error occurred while processing the request.'], 500);
         }
     }
-
- 
 }

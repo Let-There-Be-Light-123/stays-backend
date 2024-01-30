@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme, Avatar } from "@mui/material";
 import { Navigate, json, useNavigate  } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -115,7 +115,6 @@ const Sidebar = () => {
                     style={{ cursor: "pointer", borderRadius: "50%" }}
                   />
                 ) : (
-                  // Render an avatar when user photo is not available
                   <Avatar
                     alt="Avatar"
                     sx={{ width: 100, height: 100, cursor: "pointer" }}

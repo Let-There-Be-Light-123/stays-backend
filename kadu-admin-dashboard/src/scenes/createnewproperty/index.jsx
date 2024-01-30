@@ -227,7 +227,7 @@ const CreateNewProperty = () => {
                       onChange={(e) => setPropertyDetails({ ...propertyDetails, description: e.target.value })}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <Switch
                       checked={propertyDetails.isActive}
                       onChange={(e) => setPropertyDetails({ ...propertyDetails, isActive: e.target.checked })}
@@ -242,7 +242,7 @@ const CreateNewProperty = () => {
                       color="secondary"
                     />
                     <Typography>Featured</Typography>
-                  </Grid>
+                  </Grid> */}
                      
                   <Grid item xs={12}>
                     <TextField
@@ -285,9 +285,7 @@ const CreateNewProperty = () => {
                       <Marker position={selectedLocation} />
                     </GoogleMap>
                   </Grid>
-                  <Grid item xs={12}>
-                    <CustomGallery images={images} setImages={setImages} />
-                  </Grid>
+                  
                   <Grid item xs={6}>
                     <Button type="button" variant="contained" color="secondary" onClick={createProperty}>
                       Create Property

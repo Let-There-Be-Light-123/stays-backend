@@ -17,7 +17,10 @@ class NotificationController extends Controller
     {
         try {
             $url = 'https://fcm.googleapis.com/fcm/send';
-            $FcmToken = User::whereNotNull('remember_token')->pluck('remember_token')->all();
+            $FcmToken = User::whereNotNull('remember_token')
+            ->where('remember_token', '!=', '')
+            ->pluck('remember_token')
+            ->all();            
             $serverKey = env('FIREBASE_SERVER_KEY');
             
             Log::info('FCM Tokens to send the notification: ' . json_encode($FcmToken));

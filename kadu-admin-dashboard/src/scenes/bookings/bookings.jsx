@@ -64,45 +64,45 @@ const Bookings = () => {
             });
             const mappedBookings = filteredBookings.map((booking, index) => ({
               id: index + 1,
-              bookingReference: booking.booking_reference,
-              property: booking.property,
-              roomName: booking.rooms[0],
-              roomId: booking.rooms[0], 
-              userEmail: booking.booked_by.email, // Assuming only one guest in the array
-              socialSecurityNumber: booking.booked_by.social_security, // Assuming the second guest's social_security
-              checkInDate: new Date(booking.check_in_date),
-              checkOutDate: new Date(booking.check_out_date),
+              bookingReference: booking?.booking_reference,
+              property: booking?.property,
+              roomName: booking?.rooms[0],
+              roomId: booking?.rooms[0], 
+              userEmail: booking?.booked_by.email, // Assuming only one guest in the array
+              socialSecurityNumber: booking.booked_by?.social_security, // Assuming the second guest's social_security
+              checkInDate: new Date(booking?.check_in_date),
+              checkOutDate: new Date(booking?.check_out_date),
               // files: booking.files,
               updatedAt: booking && booking.updated_at ? Date(booking.updated_at) :new Date,
               createdAt: booking && booking.created_at ? Date(booking.created_at) : new Date(),
-              status: booking.status,
-              guests: booking.guests.map(guest => ({
-                name: guest.name,
-                email: guest.email,
-                socialSecurity: guest.social_security,
-                phone: guest.phone,
-                roleId: guest.role_id,
-                isVerified: guest.is_verified,
-                isActive: guest.is_active,
-                emailVerifiedAt: guest.email_verified_at,
+              status: booking?.status,
+              guests: booking?.guests.map(guest => ({
+                name: guest?.name,
+                email: guest?.email,
+                socialSecurity: guest?.social_security,
+                phone: guest?.phone,
+                roleId: guest?.role_id,
+                isVerified: guest?.is_verified,
+                isActive: guest?.is_active,
+                emailVerifiedAt: guest?.email_verified_at,
                 addressId: guest?.address_id,
-                createdAt: new Date(guest.created_at),
-                updatedAt: new Date(guest.updated_at)
+                createdAt: new Date(guest?.created_at),
+                updatedAt: new Date(guest?.updated_at)
               })),
               bookedBy: {
-                name: booking.booked_by.name,
-                email: booking.booked_by.email,
-                socialSecurity: booking.booked_by.social_security,
-                phone: booking.booked_by.phone,
-                roleId: booking.booked_by.role_id,
-                isVerified: booking.booked_by.is_verified,
-                isActive: booking.booked_by.is_active,
-                emailVerifiedAt: booking.booked_by.email_verified_at,
-                addressId: booking.booked_by.address_id,
-                createdAt: new Date(booking.booked_by.created_at),
-                updatedAt: new Date(booking.booked_by.updated_at)
+                name: booking.booked_by?.name,
+                email: booking.booked_by?.email,
+                socialSecurity: booking.booked_by?.social_security,
+                phone: booking.booked_by?.phone,
+                roleId: booking.booked_by?.role_id,
+                isVerified: booking.booked_by?.is_verified,
+                isActive: booking.booked_by?.is_active,
+                emailVerifiedAt: booking.booked_by?.email_verified_at,
+                addressId: booking.booked_by?.address_id,
+                createdAt: new Date(booking.booked_by?.created_at),
+                updatedAt: new Date(booking.booked_by?.updated_at)
               },
-              signatures: booking.signatures
+              signatures: booking?.signatures
             }));
     
             setBookings(mappedBookings);

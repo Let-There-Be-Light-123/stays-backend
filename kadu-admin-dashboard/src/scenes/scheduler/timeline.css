@@ -2,4 +2,18 @@
     background-color: #3498db; /* Set your custom background color */
     color: green; /* Set your custom text color */
   }
-  
+.timeline-container{
+  max-width: 85vw;
+}
+.react-calendar-timeline {
+  min-height: 50vh;
+}
+.rct-outer{
+  min-height: 50vh;
+}
+.rct-item {
+  background-color: orange!important;
+}
+.react-calendar-timeline .rct-scroll{
+  overflow:hidden ;
+}
