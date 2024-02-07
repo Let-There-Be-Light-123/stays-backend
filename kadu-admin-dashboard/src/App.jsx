@@ -69,7 +69,7 @@ function App() {
               <Route path="/line" element={<ProtectedRoute element={<Line />} />} />
               <Route path="/faq" element={<ProtectedRoute element={<FAQ />} />} />
               <Route path="/bk" element={<ProtectedRoute element={<BookingVoucher />} />} />
-              <Route path="/Scheduler" element={<ProtectedRoute element={<TimelineRenderer dataComponent={mockAPI} />} />} />
+              <Route path="/Scheduler" element={<ProtectedRoute element={<TimelineRenderer  />} />} />
               <Route path="/geography" element={<ProtectedRoute element={<Geography />} />} />
               <Route path="/bookings/:status" element={<ProtectedRoute element={<Bookings />} />} />
               <Route path="/userapplications" element={<ProtectedRoute element={<UserApplications />} />} />

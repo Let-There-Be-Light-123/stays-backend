@@ -153,7 +153,7 @@ const EditProperty = () => {
         address_id: selectedLocation?.place_id || '',
       };
 
-      // Call the update property API if any property details have changed
+
       await fetch(`${Config.BASE_URL}/api/properties/${propertyId}`, {
         method: 'PUT',
         headers: {
@@ -432,7 +432,11 @@ const EditProperty = () => {
   };
 
   const handleBookRooms = () => {
-    navigate('/Scheduler');
+    navigate('/Scheduler', {
+      state: {
+        propertyDetails: propertyDetails,
+      },
+    });
   };
 
   function handleImagesChange(updatedImages) {

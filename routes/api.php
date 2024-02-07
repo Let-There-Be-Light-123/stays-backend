@@ -100,7 +100,7 @@ Route::put('/bookings/{bookingReference}', [BookingController::class, 'update'])
 Route::delete('/bookings/{bookingReference}', [BookingController::class, 'destroy']);
 Route::get('/bookings/details', [BookingController::class, 'getBookingDetails']);
 Route::get('/user/bookings', [BookingController::class, 'getUserBookings'])->middleware('auth:sanctum');
-
+Route::post('/property/bookings', [BookingController:: class, 'getPropertyBookings']);
 
 Route::post('/webhook', [WebhookController::class, 'handle']);
 
@@ -141,12 +141,14 @@ Route::post('/user/favorite-properties/remove', [UserController::class, 'removeF
 
 Route::get('/properties/{propertyId}/reviews', [UserReviewController::class, 'index'])->name('reviews.index');
 Route::get('/properties/{propertyId}/reviews/create', [UserReviewController::class, 'create'])->name('reviews.create');
-Route::post('/reviews', [UserReviewController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/reviews', [UserReviewController::class, 'createReviews'])->middleware('auth:sanctum');
+Route::post('/properties/reviews', [UserReviewController::class, 'showPropertyReviews']);
+Route::delete('/user-reviews/{id}', [UserReviewController::class, 'destroy']);
 
 Route::resource('signatures', SignatureController::class)->only([
     'index', 'store', 'show', 'update', 'destroy',
 ]);
-Route::get('get-signature-by-booking', [SignatureController::class, 'getSignaturesByBookingId']);
+Route::post('get-signature-by-booking', [SignatureController::class, 'getSignaturesByBookingId']);
 
 
 Route::post('/api/send-web-notification-to-all', [NotificationController::class, 'sendWebNotificationToAll']);

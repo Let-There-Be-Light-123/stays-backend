@@ -528,10 +528,8 @@ class BookingController extends Controller
     public function showRooms($bookingReference)
     {
         try {
-            // Retrieve a specific booking by reference with rooms details
             $booking = Booking::with('rooms')->findOrFail($bookingReference);
 
-            // Return a JSON response with the rooms details
             return response()->json(['rooms' => $booking->rooms]);
         } catch (\Exception $e) {
             Log::error('Error in showRooms method: ' . $e->getMessage());
@@ -592,6 +590,41 @@ class BookingController extends Controller
             Log::error('Error: ' . $e->getMessage() . PHP_EOL . 'Stack Trace: ' . $e->getTraceAsString());
     
             // Return an error response
+            return response()->json(['error' => $errorMessage], 500);
+        }
+    }
+
+    public function getPropertyBookings(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'property_id' => 'required|string|exists:properties,property_id',
+            ]);
+
+            $bookings = Booking::whereHas('rooms', function ($query) use ($validatedData) {
+                $query->where('property_id', $validatedData['property_id']);
+            })->with(['rooms', 'guests'])->get();
+
+            $transformedBookings = $bookings->map(function ($booking) {
+                return [
+                    'booking_reference' => $booking->booking_reference,
+                    'rooms' => $booking->rooms,
+                    'guests' => $booking->guests,
+                    'check_in_date' => $booking->check_in_date,
+                    'check_out_date' => $booking->check_out_date,
+                    'status' => $booking->status,
+                    'booked_by' => [
+                        'id' => $booking->bookedBy->id,
+                        'name' => $booking->bookedBy->name,
+                        'email' => $booking->bookedBy->email,
+                    ],
+                ];
+            });
+
+            return response()->json(['bookings' => $transformedBookings]);
+        } catch (\Exception $e) {
+            $errorMessage = 'Internal Server Error';
+            Log::error('Error: ' . $e->getMessage() . PHP_EOL . 'Stack Trace: ' . $e->getTraceAsString());
             return response()->json(['error' => $errorMessage], 500);
         }
     }

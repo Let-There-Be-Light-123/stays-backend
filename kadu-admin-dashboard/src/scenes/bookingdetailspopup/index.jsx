@@ -87,8 +87,8 @@ const BookingDetailsPopup = ({ open, handleClose, bookingDetails, onUpdateStatus
                         </div>
                         <h3 style={{ fontSize: '22px' }}>Guests:</h3>
                         <ul>
-                            {bookingDetails.guests && Array.isArray(bookingDetails.guests)
-                                ? bookingDetails.guests.map((guest, index) => (
+                            {bookingDetails.guests && Array.isArray(bookingDetails.guests) && bookingDetails.guests.length > 0
+                                ?    bookingDetails.guests.map((guest, index) => (
                                     <li key={index}>
                                         {guest && guest.name && (
                                             <>

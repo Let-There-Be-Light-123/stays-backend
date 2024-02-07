@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class File extends Model
 {
@@ -15,6 +16,7 @@ class File extends Model
       'proeprty_id',
       'booking_reference',
       'social_security',
+      'review_id',
       'filename',
       'filepath',
       'filetype',
@@ -74,5 +76,10 @@ class File extends Model
    public function scopeUserFiles($query, $userId)
    {
       return $query->where('social_security', $userId);
+   }
+
+   public function review(): BelongsTo
+   {
+       return $this->belongsTo(Review::class);
    }
 }

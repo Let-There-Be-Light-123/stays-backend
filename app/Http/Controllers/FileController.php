@@ -258,7 +258,6 @@ class FileController extends Controller
                 $existingFile->filetype = $imageType;
                 $existingFile->save();
             } else {
-                // Upload a new file
                 $image = $request->file('image');
                 $imageType = $image->getMimeType();
                 \Log::info("Image type received for user {$userId}: {$imageType}");
@@ -267,7 +266,6 @@ class FileController extends Controller
                 $image->storeAs($userDirectory, $filename);
                 \Log::info("Image uploaded for user {$userId}: {$filename}");
     
-                // Save a new file record
                 $file = new File();
                 $file->social_security = $userId;
                 $file->filename = $filename;

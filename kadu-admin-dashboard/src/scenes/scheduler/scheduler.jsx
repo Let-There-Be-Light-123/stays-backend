@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Timeline, { DateHeader, TimelineGroup, TimelineHeaders } from "react-calendar-timeline";
 import "react-calendar-timeline/lib/Timeline.css";
+import { useLocation } from 'react-router-dom';
 import moment from "moment";
 import FilterBox from "./filterbox";
 import DataConvertHelper from "./dataconverterhelper.js";
@@ -8,50 +9,94 @@ import { tokens } from "../../theme";
 import { useTheme } from "@mui/material";
 import 'react-calendar-timeline/lib/Timeline.css'
 import './timeline.css';
+import Config from "../../config/config.js";
 const TimelineRenderer = (props) => {
+  const location = useLocation();
+  const propertyDetails = location.state?.propertyDetails;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selectedGroups, updateSelectedGroups] = useState([]);
-  const groups = [{ id: 1, title: 'Room 1' }, { id: 2, title: 'Room 2' }, { id: 3, title: 'Room 3' }, { id: 4, title: 'Room 4' }]
+  const [groups, setGroups] = useState([]);
+  const [items, setItems] = useState([]);
 
-  const items = [
-    {
-      id: 1,
-      group: 1,
-      title: 'Booking 1',
-      start_time: moment('2024-01-25T08:00:00'),
-      end_time: moment('2024-01-26T09:00:00'),
-      style: { background: 'red' },
-    },
-    {
-      id: 2,
-      group: 2,
-      title: 'Booking 2',
-      start_time: moment('2024-01-24T14:00:00'),
-      end_time: moment('2024-01-25T15:00:00'),
-    },
-    {
-      id: 3,
-      group: 1,
-      title: 'Booking 3',
-      start_time: moment('2024-01-27T10:00:00'),
-      end_time: moment('2024-01-27T11:00:00'),
-    },
-    {
-      id: 4,
-      group: 2,
-      title: 'Booking 4',
-      start_time: moment('2024-01-26T18:00:00'),
-      end_time: moment('2024-01-27T19:00:00'),
-    },
-    {
-      id: 5,
-      group: 1,
-      title: 'Booking 5',
-      start_time: moment('2024-01-23T12:00:00'),
-      end_time: moment('2024-01-28T13:00:00'),
-    },
-  ];
+  useEffect(() => {
+
+    if (propertyDetails && propertyDetails.rooms) {
+      console.log(propertyDetails);
+      fetchPropertyBookings(propertyDetails.id);
+      const processedGroups = propertyDetails.rooms.map(room => ({
+        id: room.room_id,
+        title: room.room_name
+      }));
+      setGroups(processedGroups);
+    }
+  }, [propertyDetails]);
+
+  const fetchPropertyBookings = async (propertyId) => {
+    try {
+      const response = await fetch(`${Config.BASE_URL}/api/property/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ property_id: propertyId }),
+      });
+        if (!response.ok) {
+        throw new Error('Failed to fetch property bookings');
+      }
+      const data = await response.json();
+      const bookingItems = data.bookings.map((booking, index) => ({
+        id: index + 1,
+        group: booking.rooms[0],
+        title: `Booking ${index + 1}`,
+        start_time: moment(booking.check_in_date),
+        end_time: moment(booking.check_out_date),
+        style: { background: colors[index % colors.length] },
+      }));
+      console.log(bookingItems);
+      setItems(bookingItems);
+    } catch (error) {
+      console.error('Error fetching property bookings:', error.message);
+    }
+  };
+  // const items = [
+  //   {
+  //     id: 1,
+  //     group: 1,
+  //     title: 'Booking 1',
+  //     start_time: moment('2024-01-25T08:00:00'),
+  //     end_time: moment('2024-01-26T09:00:00'),
+  //     style: { background: 'red' },
+  //   },
+  //   {
+  //     id: 2,
+  //     group: 2,
+  //     title: 'Booking 2',
+  //     start_time: moment('2024-01-24T14:00:00'),
+  //     end_time: moment('2024-01-25T15:00:00'),
+  //   },
+  //   {
+  //     id: 3,
+  //     group: 1,
+  //     title: 'Booking 3',
+  //     start_time: moment('2024-01-27T10:00:00'),
+  //     end_time: moment('2024-01-27T11:00:00'),
+  //   },
+  //   {
+  //     id: 4,
+  //     group: 2,
+  //     title: 'Booking 4',
+  //     start_time: moment('2024-01-26T18:00:00'),
+  //     end_time: moment('2024-01-27T19:00:00'),
+  //   },
+  //   {
+  //     id: 5,
+  //     group: 1,
+  //     title: 'Booking 5',
+  //     start_time: moment('2024-01-23T12:00:00'),
+  //     end_time: moment('2024-01-28T13:00:00'),
+  //   },
+  // ];
 
   const timeSteps={
     hour: 4,
@@ -60,28 +105,6 @@ const TimelineRenderer = (props) => {
     year: 1
   };
   
-
-  itemRenderer: ({
-    item,
-    itemContext,
-    getItemProps,
-    getResizeProps
-  }) => {
-    const { left: leftResizeProps, right: rightResizeProps } = getResizeProps()
-    return (
-      <div {...getItemProps(item.itemProps)}>
-        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ''}
-  
-        <div
-          className="rct-item-content"
-          style={{ maxHeight: `${itemContext.dimensions.height}` }}
-        >
-          {itemContext.title}
-        </div>
-  
-        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ''}
-      </div>
-    )};
 
 
   const handleInputChange = (_event, newInput) => {
@@ -93,12 +116,6 @@ const TimelineRenderer = (props) => {
   };
   const handleItemClick = () => {
 
-  };
-
-  const getGroupsToShow = () => {
-    return selectedGroups.length
-      ? groups.filter((group) => selectedGroups.includes(group.title))
-      : groups;
   };
 
   return (
