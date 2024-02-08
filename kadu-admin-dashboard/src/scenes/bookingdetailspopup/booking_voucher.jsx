@@ -36,13 +36,12 @@ const BookingVoucher = forwardRef((props, ref) => {
           <div className="booking-details" style={{ display: 'flex' }}>
             <div className='booking-reference' style={{ width: '50%' }}>
               <div className="booking-id">Booking ID: <br /> {bookingDetails.bookingReference}</div>
-              <div className='booking-date'>Booking Date: {bookingDetails.updatedAt}</div>
+              <div className='booking-date'>Booking Date: {formatDate(bookingDetails.updatedAt)}</div>
               <div >Check in Time: 14:00</div>
               <div >Check out Time: 10:00</div>
             </div>
             <div className='hotel-details' style={{ width: '50%' }}>
               <div className="hotel-name">Hotel Name: {bookingDetails.property && bookingDetails.property[0]?.property_name}</div>
-              <div className="booking-date">Booking Date: {bookingDetails.updatedAt}</div>
               <div className="address">{bookingDetails.property && bookingDetails.property[0]?.address}</div>
               <div className="timings" style={{ display: 'flex' }}>
                 <div className="check-in" >
@@ -76,8 +75,9 @@ const BookingVoucher = forwardRef((props, ref) => {
               <div className="horizontal-divider" style={{ borderBottom: '1px solid #ddd', marginBottom: '20px' }}></div>
               {bookingDetails.bookedBy && (
                 <>
-                  <div className="main-guest">Main Guest: {bookingDetails.bookedBy.name}</div>
-                  <div className="social-security">Social Security Number: {bookingDetails.bookedBy.socialSecurity}</div>
+                  <div className="main-guest">Main Guest: {bookingDetails.bookedBy.name.toUpperCase()}</div>
+                  {/* <div className="social-security">Social Security Number: {bookingDetails.bookedBy.socialSecurity}</div> */}
+                  <div className="social-security">Social Security Number: {bookingDetails.bookedBy.socialSecurity.toString().replace(/(\d{3})(\d{2})(\d{4})/, "$1-$2-$3")}</div>
                 </>
               )}
               <div className="room-id">Room ID: {bookingDetails.roomName}</div>
@@ -87,11 +87,13 @@ const BookingVoucher = forwardRef((props, ref) => {
             </div>
           </div>
         )}
-        <div className='content-signature' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-          {bookingDetails && bookingDetails.bookedBy && (
-            <img className="signature" src={`${Config.BASE_URL}/storage/public/uploads/signatures/${bookingDetails.bookingReference}/${bookingDetails.signatures[0]?.signature}`} alt="Signature" />
-          )}
-          <div className='signature-text'>Signature</div>
+        <div className='signature-wrapper'>
+          <div className='content-signature' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            {bookingDetails && bookingDetails.bookedBy && (
+              <img className="signature" src={`${Config.BASE_URL}/storage/public/uploads/signatures/${bookingDetails.bookingReference}/${bookingDetails.signatures[0]?.signature}`} alt="Signature" />
+            )}
+            <div className='signature-text'>Signature</div>
+          </div>
         </div>
       </div>
       <div className="footer">
