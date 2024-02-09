@@ -241,8 +241,8 @@ class FileController extends Controller
             $userDirectory = "public/uploads/users/{$userId}";
     
             if (!Storage::exists($userDirectory)) {
-                File::makeDirectory($userDirectory, 0777, true);
-                chmod($userDirectory, 0777);
+                Storage::makeDirectory($userDirectory);
+                Storage::setVisibility($userDirectory, 'public');
             }
     
             $existingFile = File::where('social_security', $userId)->first();
@@ -290,8 +290,9 @@ class FileController extends Controller
             $property = Property::find($propertyId);
             $propertyName = $property->name ?? 'property';
             $propertyDirectory = "public/uploads/properties/{$propertyId}";
-            File::makeDirectory($propertyDirectory, 0777, true);
-            chmod($propertyDirectory, 0777);
+            Storage::makeDirectory($propertyDirectory);
+            Storage::setVisibility($propertyDirectory, 'public');
+
     
             $uploadedFiles = [];
             Log::info($request);
